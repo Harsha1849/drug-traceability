@@ -88,184 +88,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
     <script>
-        const contractAddress = "0xC226590219966C57C41CD4FcceA3348ae13c2BC6"; // Replace with your contract address
-        const contractABI = [
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "id",
-                "type": "uint256"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            }
-        ],
-        "name": "DrugOwnershipTransferred",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "id",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "manufacturer",
-                "type": "address"
-            }
-        ],
-        "name": "DrugRegistered",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_id",
-                "type": "uint256"
-            },
-            {
-                "internalType": "string",
-                "name": "_name",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "_manufacturer",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "_batchNumber",
-                "type": "string"
-            }
-        ],
-        "name": "registerDrug",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_id",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "_newOwner",
-                "type": "address"
-            }
-        ],
-        "name": "transferOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "drugs",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "id",
-                "type": "uint256"
-            },
-            {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "manufacturer",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "batchNumber",
-                "type": "string"
-            },
-            {
-                "internalType": "address",
-                "name": "currentOwner",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_id",
-                "type": "uint256"
-            }
-        ],
-        "name": "getDrugDetails",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "manufacturer",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "batchNumber",
-                "type": "string"
-            },
-            {
-                "internalType": "address",
-                "name": "currentOwner",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    }
-];
+        const contractAddress = ""; //contractaddress
+        const contractABI = [ ] //abi
 
         let web3;
         let contract;
         let userAccount;
 
-        // Initialize Web3 and contract
+       
         async function initWeb3() {
             if (window.ethereum) {
                 web3 = new Web3(window.ethereum);
@@ -285,29 +115,29 @@
             }
         }
 
-        // Register a drug
+      
 async function registerDrug() {
     const drugId = document.getElementById("drugId").value;
     const drugName = document.getElementById("drugName").value;
     const drugManufacturer = document.getElementById("drugManufacturer").value;
     const drugBatchNumber = document.getElementById("drugBatchNumber").value;
 
-    // Show processing message
+    
     document.getElementById("output").innerText = "Processing... Please wait.";
     document.getElementById("output").classList.remove("error");
     document.getElementById("output").classList.add("info");
 
     try {
-        // Estimate gas and register the drug
+
         const gasEstimate = await contract.methods.registerDrug(drugId, drugName, drugManufacturer, drugBatchNumber).estimateGas({ from: userAccount });
         await contract.methods.registerDrug(drugId, drugName, drugManufacturer, drugBatchNumber).send({ from: userAccount, gas: gasEstimate });
 
-        // Update output on success
+ 
         document.getElementById("output").innerText = "Drug registered successfully!";
         document.getElementById("output").classList.remove("info");
         document.getElementById("output").classList.add("success");
     } catch (error) {
-        // Update output on error
+  
         console.error(error);
         document.getElementById("output").innerText = "Error registering drug: " + error.message;
         document.getElementById("output").classList.remove("info");
@@ -316,7 +146,7 @@ async function registerDrug() {
 }
 
 
-        // Get drug details by ID
+  
         async function getDrugDetailsById() {
             const drugId = document.getElementById("drugIdForDetails").value;
 
@@ -337,7 +167,7 @@ async function registerDrug() {
             }
         }
 
-        // Transfer ownership
+       
         async function transferOwnership() {
             const drugId = document.getElementById("transferId").value;
             const newOwner = document.getElementById("newOwner").value;
@@ -354,7 +184,6 @@ async function registerDrug() {
             }
         }
 
-        // Event listeners for buttons
         document.getElementById("connectBtn").addEventListener("click", initWeb3);
         document.getElementById("registerDrugBtn").addEventListener("click", registerDrug);
         document.getElementById("getDrugDetailsBtn").addEventListener("click", getDrugDetailsById);
