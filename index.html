@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Traceability</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Drug Traceability</h1>
+
+        <button id="connectBtn" class="button">Connect MetaMask</button>
+        <div id="connectionStatus" class="output"></div>
+
+        <h2>Register a Drug</h2>
+        <input type="text" id="drugId" class="input-field" placeholder="Drug ID">
+        <input type="text" id="drugName" class="input-field" placeholder="Drug Name">
+        <input type="text" id="drugManufacturer" class="input-field" placeholder="Manufacturer">
+        <input type="text" id="drugBatchNumber" class="input-field" placeholder="Batch Number">
+        <button id="registerDrugBtn" class="button">Register Drug</button>
+
+        <h2>Get Drug Details by ID</h2>
+        <input type="text" id="drugIdForDetails" class="input-field" placeholder="Enter Drug ID">
+        <button id="getDrugDetailsBtn" class="button">Get Drug Details</button>
+
+
+        <h2>Transfer Ownership</h2>
+        <input type="text" id="transferId" class="input-field" placeholder="Drug ID">
+        <input type="text" id="newOwner" class="input-field" placeholder="New Owner Address">
+        <button id="transferOwnershipBtn" class="button">Transfer Ownership</button>
+
+        <div id="output" class="output"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+    <script>
+        const contractAddress = "0xC226590219966C57C41CD4FcceA3348ae13c2BC6"; // Replace with your contract address
+        const contractABI = [
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
+        "name": "DrugOwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "manufacturer",
+                "type": "address"
+            }
+        ],
+        "name": "DrugRegistered",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_id",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "_name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "_manufacturer",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "_batchNumber",
+                "type": "string"
+            }
+        ],
+        "name": "registerDrug",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_id",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "drugs",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "manufacturer",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "batchNumber",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "currentOwner",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_id",
+                "type": "uint256"
+            }
+        ],
+        "name": "getDrugDetails",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "manufacturer",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "batchNumber",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "currentOwner",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+];
+
+        let web3;
+        let contract;
+        let userAccount;
+
+        // Initialize Web3 and contract
+        async function initWeb3() {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(contractABI, contractAddress);
+                try {
+                    await window.ethereum.request({ method: "eth_requestAccounts" });
+                    userAccount = (await web3.eth.getAccounts())[0];
+                    document.getElementById("connectionStatus").innerText = "MetaMask Connected: " + userAccount;
+                    document.getElementById("connectionStatus").classList.add("success");
+                } catch (error) {
+                    document.getElementById("connectionStatus").innerText = "MetaMask connection failed.";
+                    document.getElementById("connectionStatus").classList.add("error");
+                }
+            } else {
+                document.getElementById("connectionStatus").innerText = "Please install MetaMask.";
+                document.getElementById("connectionStatus").classList.add("error");
+            }
+        }
+
+        // Register a drug
+async function registerDrug() {
+    const drugId = document.getElementById("drugId").value;
+    const drugName = document.getElementById("drugName").value;
+    const drugManufacturer = document.getElementById("drugManufacturer").value;
+    const drugBatchNumber = document.getElementById("drugBatchNumber").value;
+
+    // Show processing message
+    document.getElementById("output").innerText = "Processing... Please wait.";
+    document.getElementById("output").classList.remove("error");
+    document.getElementById("output").classList.add("info");
+
+    try {
+        // Estimate gas and register the drug
+        const gasEstimate = await contract.methods.registerDrug(drugId, drugName, drugManufacturer, drugBatchNumber).estimateGas({ from: userAccount });
+        await contract.methods.registerDrug(drugId, drugName, drugManufacturer, drugBatchNumber).send({ from: userAccount, gas: gasEstimate });
+
+        // Update output on success
+        document.getElementById("output").innerText = "Drug registered successfully!";
+        document.getElementById("output").classList.remove("info");
+        document.getElementById("output").classList.add("success");
+    } catch (error) {
+        // Update output on error
+        console.error(error);
+        document.getElementById("output").innerText = "Error registering drug: " + error.message;
+        document.getElementById("output").classList.remove("info");
+        document.getElementById("output").classList.add("error");
+    }
+}
+
+
+        // Get drug details by ID
+        async function getDrugDetailsById() {
+            const drugId = document.getElementById("drugIdForDetails").value;
+
+            try {
+                const drug = await contract.methods.getDrugDetails(drugId).call();
+                const details = `
+                    Name: ${drug[0]}<br>
+                    Manufacturer: ${drug[1]}<br>
+                    Batch Number: ${drug[2]}<br>
+                    Owner: ${drug[3]}
+                `;
+                document.getElementById("output").innerHTML = details;
+                document.getElementById("output").classList.add("success");
+            } catch (error) {
+                console.error(error);
+                document.getElementById("output").innerText = "Error fetching drug details: " + error.message;
+                document.getElementById("output").classList.add("error");
+            }
+        }
+
+        // Transfer ownership
+        async function transferOwnership() {
+            const drugId = document.getElementById("transferId").value;
+            const newOwner = document.getElementById("newOwner").value;
+
+            try {
+                const gasEstimate = await contract.methods.transferOwnership(drugId, newOwner).estimateGas({ from: userAccount });
+                await contract.methods.transferOwnership(drugId, newOwner).send({ from: userAccount, gas: gasEstimate });
+                document.getElementById("output").innerText = "Ownership transferred successfully!";
+                document.getElementById("output").classList.add("success");
+            } catch (error) {
+                console.error(error);
+                document.getElementById("output").innerText = "Error transferring ownership: " + error.message;
+                document.getElementById("output").classList.add("error");
+            }
+        }
+
+        // Event listeners for buttons
+        document.getElementById("connectBtn").addEventListener("click", initWeb3);
+        document.getElementById("registerDrugBtn").addEventListener("click", registerDrug);
+        document.getElementById("getDrugDetailsBtn").addEventListener("click", getDrugDetailsById);
+        document.getElementById("transferOwnershipBtn").addEventListener("click", transferOwnership);
+    </script>
+
+</body>
+</html>
