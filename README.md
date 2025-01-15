@@ -42,3 +42,6 @@ https://github.com/user-attachments/assets/1107c582-8aa2-41c2-9abb-abd303b87b97
 • Enable notifications for ownership transfers or changes in drug status.
 
 • Improve the JS and build an app which is mobile and desktop friendly.
+
+## Contributing
+Feel free to fork this repository, submit issues, or make pull requests. Any contributions to improve the project or add new features are welcome.
